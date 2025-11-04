@@ -35,3 +35,8 @@ require "nvchad.autocmds"
 vim.schedule(function()
   require "mappings"
 end)
+
+-- Make sure .cu and .cuh are treated as 'cuda' filetype
+vim.filetype.add({
+  extension = { cu = "cuda", cuh = "cuda" },
+})
