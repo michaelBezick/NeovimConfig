@@ -1,46 +1,39 @@
+-- NvChad LSP config (Neovim 0.11+)
+-- Replaces legacy `require("lspconfig").X.setup{...}` with `vim.lsp.config()` + `vim.lsp.enable()`
+-- to avoid the nvim-lspconfig "framework is deprecated" warning.
 
--- Load NvChad defaults (capabilities, on_attach, etc.)
-require("nvchad.configs.lspconfig").defaults()
-
-local lspconfig = require("lspconfig")
-local nvlsp = require("nvchad.configs.lspconfig")
-
--- Simple servers that don't need special config
-local servers = { "html", "cssls", "bashls" }
-
-for _, srv in ipairs(servers) do
-  lspconfig[srv].setup {
-    on_attach = nvlsp.on_attach,
-    on_init = nvlsp.on_init,
-    capabilities = nvlsp.capabilities,
-  }
+local ok = (vim.lsp ~= nil) and (vim.lsp.config ~= nil) and (vim.lsp.enable ~= nil)
+if not ok then
+  vim.notify(
+    "This LSP config expects Neovim 0.11+. Update Neovim (or keep the legacy lspconfig setup).",
+    vim.log.levels.ERROR
+  )
+  return
 end
 
--- -- ---- clangd (explicit config) ----
--- lspconfig.clangd.setup {
---   on_attach = nvlsp.on_attach,
---   on_init = nvlsp.on_init,
---   capabilities = nvlsp.capabilities,
---   cmd = {
---     "clangd",
---     "--header-insertion=never",
---     "--background-index",
---     "--clang-tidy",
---     "--completion-style=detailed",
---     "--pch-storage=memory",
---     -- NB: Often better as a glob so clangd accepts multiple compilers:
---     -- "--query-driver=/usr/bin/clang++,/usr/bin/clang,/usr/bin/g++,/usr/bin/gcc,/usr/bin/*-g++,/usr/bin/*-gcc"
---     "--compile-commands-dir=build",
---   },
--- }
+-- Pull NvChad defaults (capabilities, on_attach, on_init, etc.)
+local nvlsp = require("nvchad.configs.lspconfig")
 
--- ---- clangd (explicit config) ----
-lspconfig.clangd.setup {
+local base = {
   on_attach = nvlsp.on_attach,
   on_init = nvlsp.on_init,
   capabilities = nvlsp.capabilities,
+}
 
-  -- IMPORTANT: these help clangd understand CUDA
+local function with_base(opts)
+  return vim.tbl_deep_extend("force", {}, base, opts or {})
+end
+
+-- -----------------------------
+-- Simple servers
+local servers = { "html", "cssls", "bashls" }
+for _, srv in ipairs(servers) do
+  vim.lsp.config(srv, with_base({}))
+end
+
+-- -----------------------------
+-- clangd (explicit config, CUDA-friendly)
+vim.lsp.config("clangd", with_base({
   cmd = {
     "clangd",
     "--background-index",
@@ -48,55 +41,51 @@ lspconfig.clangd.setup {
     "--completion-style=detailed",
     "--header-insertion=never",
     "--pch-storage=memory",
-
-    -- If you use CMake, point clangd at your compile_commands.json dir:
     "--compile-commands-dir=build",
-
-    -- Point to your CUDA install (adjust if different)
-    -- "--cuda-path=/usr/local/cuda",
-
-    -- Let clangd parse args from common compilers (nvcc, gcc, clang)
     "--query-driver=/usr/bin/clang++,/usr/bin/clang,/usr/bin/g++,/usr/bin/gcc,/usr/bin/*-g++,/usr/bin/*-gcc,/usr/local/cuda/bin/nvcc",
   },
-
-  -- Make clangd attach to CUDA buffers too
   filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
-}
+}))
 
-
--- ---- Python: basedpyright (primary) ----
-lspconfig.basedpyright.setup {
-  on_attach = nvlsp.on_attach,
-  on_init = nvlsp.on_init,
-  capabilities = nvlsp.capabilities,
+-- -----------------------------
+-- Python: basedpyright (primary)
+vim.lsp.config("basedpyright", with_base({
   settings = {
     basedpyright = {
       analysis = {
-        typeCheckingMode = "basic",      -- "standard" or "strict" if you want stricter checks
-        useLibraryCodeForTypes = true,   -- KEY: read library code when stubs are missing
+        typeCheckingMode = "basic",
+        useLibraryCodeForTypes = true,
         autoImportCompletions = true,
         diagnosticMode = "openFilesOnly",
-        -- stubPath = "typings",            -- optional
+        -- stubPath = "typings",
       },
     },
   },
-}
+}))
 
--- -- ---- Ruff (lint/quickfix) ----
--- lspconfig.ruff.setup {
---   on_attach = nvlsp.on_attach,
---   on_init = nvlsp.on_init,
---   capabilities = nvlsp.capabilities,
--- }
-
--- ---- Optional: Jedi for completion help on dynamic C-extensions ----
-lspconfig.jedi_language_server.setup {
+-- -----------------------------
+-- Optional: Jedi (completion help on dynamic C-extensions)
+vim.lsp.config("jedi_language_server", with_base({
   on_attach = function(client, bufnr)
-    -- turn off Jedi diagnostics to avoid dupes with basedpyright
-    client.server_capabilities.diagnosticProvider = false
-    if nvlsp.on_attach then nvlsp.on_attach(client, bufnr) end
+    -- disable Jedi diagnostics to avoid duplicates with basedpyright
+    client.server_capabilities.diagnosticProvider = nil
+    client.handlers["textDocument/publishDiagnostics"] = function() end
+
+    if base.on_attach then
+      base.on_attach(client, bufnr)
+    end
   end,
-  on_init = nvlsp.on_init,
-  capabilities = nvlsp.capabilities,
   single_file_support = true,
-}
+}))
+
+-- -----------------------------
+-- Enable the servers
+vim.lsp.enable({
+  "html",
+  "cssls",
+  "bashls",
+  "clangd",
+  "basedpyright",
+  "jedi_language_server",
+})
+
