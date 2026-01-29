@@ -33,6 +33,19 @@ return {
 			})
 		end,
 	},
+
+    -- lua/configs/gitsigns.lua (or wherever you override plugins)
+  require("gitsigns").setup({
+    current_line_blame = true, -- show blame for the line your cursor is on
+    current_line_blame_opts = {
+      virt_text = true,
+      virt_text_pos = "eol", -- "eol" | "overlay" | "right_align"
+      delay = 300,
+      ignore_whitespace = false,
+    },
+    current_line_blame_formatter = "<author>, <author_time:%Y-%m-%d> • <summary>",
+  })
+
 	
 	-- {
 	--   "nvim-treesitter/nvim-treesitter",
