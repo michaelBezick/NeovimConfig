@@ -42,5 +42,5 @@ end, { desc = "Format Code" })
 -- Visual mode better indenting
 map("v", ">", ">gv", { desc = "Indent in visual mode" })
 
--- Save file with Ctrl + s (optional)
--- map({ "n", "i", "v" }, "<C-s>", "<cmd> w <cr>", { desc = "Save file" })
+-- Git blame
+map("n", "<leader>gb", "<cmd>Git blame<cr>",{ desc = "Git blame (fugitive)", noremap = true, silent = true })
