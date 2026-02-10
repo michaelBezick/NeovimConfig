@@ -48,12 +48,17 @@ vim.lsp.config("clangd", with_base({
 }))
 
 -- -----------------------------
--- Python: basedpyright (primary)
-vim.lsp.config("basedpyright", with_base({
+-- Python: pyright (primary)
+vim.lsp.config("pyright", with_base({
   settings = {
-    basedpyright = {
+    pyright = {
+      -- You can add pyright-specific toggles here if you want
+      -- (most analysis knobs live under python.analysis)
+      -- disableOrganizeImports = false,
+    },
+    python = {
       analysis = {
-        typeCheckingMode = "basic",
+        -- typeCheckingMode = "off",
         useLibraryCodeForTypes = true,
         autoImportCompletions = true,
         diagnosticMode = "openFilesOnly",
@@ -62,6 +67,23 @@ vim.lsp.config("basedpyright", with_base({
     },
   },
 }))
+
+
+-- -- -----------------------------
+-- -- Python: basedpyright (primary)
+-- vim.lsp.config("basedpyright", with_base({
+--   settings = {
+--     basedpyright = {
+--       analysis = {
+--         -- typeCheckingMode = "off",
+--         useLibraryCodeForTypes = true,
+--         autoImportCompletions = true,
+--         diagnosticMode = "openFilesOnly",
+--         -- stubPath = "typings",
+--       },
+--     },
+--   },
+-- }))
 
 -- -----------------------------
 -- Optional: Jedi (completion help on dynamic C-extensions)
@@ -85,7 +107,7 @@ vim.lsp.enable({
   "cssls",
   "bashls",
   "clangd",
-  "basedpyright",
+  "pyright",
   "jedi_language_server",
 })
 
