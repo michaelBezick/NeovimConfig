@@ -49,3 +49,4 @@ vim.diagnostic.config({
   severity_sort = true,
 })
 
+require "configs.neogit_hightlights"
