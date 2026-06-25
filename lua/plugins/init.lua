@@ -33,13 +33,54 @@ return {
 			})
 		end,
 	},
-	-- {
-	--   "nvim-treesitter/nvim-treesitter",
-	--   opts = {
-	--     ensure_installed = {
-	--       "vim", "lua", "vimdoc",
-	--       "html", "css", "clangd"
-	--     },
-	--   },
-	-- },
+	{
+		"nvim-treesitter/nvim-treesitter",
+		opts = {
+			ensure_installed = {
+				"vim",
+				"lua",
+				"vimdoc",
+				"html",
+				"css",
+				"clangd",
+				"python",
+			},
+		},
+	},
+	{
+		"sphamba/smear-cursor.nvim",
+		event = "VeryLazy",
+		main = "smear_cursor",
+		opts = {
+			smear_between_buffers = true,
+			smear_between_neighbor_lines = true,
+			scroll_buffer_space = true,
+			legacy_computing_symbols_support = false,
+			smear_insert_mode = true,
+		},
+	},
+{
+  "karb94/neoscroll.nvim",
+  event = "VeryLazy",
+  config = function()
+    require("neoscroll").setup({
+      mappings = {
+        "<C-u>",
+        "<C-d>",
+        "<C-b>",
+        "<C-f>",
+        "zt",
+        "zz",
+        "zb",
+      },
+
+      hide_cursor = true,
+      stop_eof = true,
+      easing = "sine",
+
+      -- Good starting speed
+      duration_multiplier = 1.0,
+    })
+  end,
+}
 }
