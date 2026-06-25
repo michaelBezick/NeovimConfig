@@ -101,6 +101,54 @@ vim.lsp.config("jedi_language_server", with_base({
 }))
 
 -- -----------------------------
+-- MATLAB: official MathWorks language server
+--
+-- Full features require MATLAB installed on the machine running Neovim.
+-- If this machine does not have MATLAB, set matlabConnectionTiming = "never"
+-- to avoid spawn errors, but expect reduced functionality.
+
+vim.filetype.add({
+  extension = {
+    m = "matlab", -- Treat .m files as MATLAB instead of Objective-C
+  },
+})
+
+vim.lsp.config("matlab_ls", with_base({
+  cmd = { "matlab-language-server", "--stdio" },
+  filetypes = { "matlab" },
+
+  root_dir = function(bufnr, on_dir)
+    local fname = vim.api.nvim_buf_get_name(bufnr)
+    local root = vim.fs.root(fname, {
+      ".git",
+      "startup.m",
+      "matlab.prj",
+      "SimulinkProject",
+    })
+    on_dir(root or vim.fn.getcwd())
+  end,
+
+  settings = {
+    MATLAB = {
+      indexWorkspace = true,
+
+      -- On the remote/Linux machine where MATLAB exists, use the real matlabroot.
+      -- Based on your earlier shell path, this is probably:
+      installPath = "/usr/local/MATLAB/R2026a",
+
+      -- Options:
+      --   "onStart"  = start MATLAB when opening a MATLAB file
+      --   "onDemand" = start MATLAB only for features that need it
+      --   "never"    = do not start MATLAB; safer on machines without MATLAB
+      matlabConnectionTiming = "onDemand",
+
+      -- I would turn this off unless you specifically want MathWorks telemetry.
+      telemetry = false,
+    },
+  },
+}))
+
+-- -----------------------------
 -- Enable the servers
 vim.lsp.enable({
   "html",
@@ -109,5 +157,6 @@ vim.lsp.enable({
   "clangd",
   "pyright",
   "jedi_language_server",
+  "matlab_ls",
 })
 
