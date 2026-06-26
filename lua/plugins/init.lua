@@ -44,6 +44,7 @@ return {
 				"css",
 				"clangd",
 				"python",
+        "matlab"
 			},
 		},
 	},
@@ -59,28 +60,28 @@ return {
 			smear_insert_mode = true,
 		},
 	},
-{
-  "karb94/neoscroll.nvim",
-  event = "VeryLazy",
-  config = function()
-    require("neoscroll").setup({
-      mappings = {
-        "<C-u>",
-        "<C-d>",
-        "<C-b>",
-        "<C-f>",
-        "zt",
-        "zz",
-        "zb",
-      },
+	{
+		"karb94/neoscroll.nvim",
+		event = "VeryLazy",
+		config = function()
+			require("neoscroll").setup({
+				mappings = {
+					"<C-u>",
+					"<C-d>",
+					"<C-b>",
+					"<C-f>",
+					"zt",
+					"zz",
+					"zb",
+				},
 
-      hide_cursor = true,
-      stop_eof = true,
-      easing = "sine",
+				hide_cursor = true,
+				stop_eof = true,
+				easing = "sine",
 
-      -- Good starting speed
-      duration_multiplier = 1.0,
-    })
-  end,
-}
+				-- Good starting speed
+				duration_multiplier = 1.0,
+			})
+		end,
+	},
 }
