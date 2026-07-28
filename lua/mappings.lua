@@ -44,3 +44,10 @@ map("v", ">", ">gv", { desc = "Indent in visual mode" })
 
 -- Git blame
 map("n", "<leader>gb", "<cmd>Git blame<cr>",{ desc = "Git blame (fugitive)", noremap = true, silent = true })
+
+-- Toggle Markdown preview
+map("n", "<leader>mp", "<cmd>MarkdownPreviewToggle<cr>", {
+  desc = "Toggle Markdown Preview",
+  noremap = true,
+  silent = true,
+})
