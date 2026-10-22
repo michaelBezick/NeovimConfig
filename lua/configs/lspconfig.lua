@@ -55,6 +55,20 @@ vim.lsp.config(
 vim.lsp.config(
 	"pyright",
 	with_base({
+		root_dir = function(bufnr, on_dir)
+			local root = vim.fs.root(bufnr, {
+				"pyrightconfig.json", "pyproject.toml", "setup.py", "setup.cfg",
+				"requirements.txt", "Pipfile", ".git",
+			})
+			local home = vim.fs.normalize(vim.uv.os_homedir())
+			-- A home-level .git must not make all personal files a Python workspace.
+			if not root or root == home or root == "/" then
+				root = vim.fs.dirname(vim.api.nvim_buf_get_name(bufnr))
+			end
+			if root and root ~= home and root ~= "/" then
+				on_dir(root)
+			end
+		end,
 		settings = {
 			pyright = {
 				-- You can add pyright-specific toggles here if you want
