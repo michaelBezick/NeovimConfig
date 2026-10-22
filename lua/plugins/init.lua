@@ -84,10 +84,54 @@ return {
 			})
 		end,
 	},
-  {
-    "iamcco/markdown-preview.nvim",
-    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-    ft = { "markdown" },
-    build = function() vim.fn["mkdp#util#install"]() end,
-}
+	{
+		"iamcco/markdown-preview.nvim",
+		cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+		ft = { "markdown" },
+		build = function()
+			vim.fn["mkdp#util#install"]()
+		end,
+		{
+			"r-pletnev/pdfreader.nvim",
+			lazy = false,
+			dependencies = {
+				"folke/snacks.nvim",
+				"nvim-telescope/telescope.nvim",
+			},
+			config = function()
+				require("pdfreader").setup()
+			end,
+		},
+	},
+	{
+		"3rd/image.nvim",
+		lazy = false,
+		priority = 1000,
+		build = false,
+
+		opts = {
+			backend = "kitty",
+			processor = "magick_cli",
+
+			integrations = {
+				markdown = {
+					enabled = false,
+				},
+				neorg = {
+					enabled = false,
+				},
+			},
+
+			max_width_window_percentage = 90,
+			max_height_window_percentage = 90,
+
+			hijack_file_patterns = {
+				"*.png",
+				"*.jpg",
+				"*.jpeg",
+				"*.gif",
+				"*.webp",
+			},
+		},
+	},
 }
