@@ -13,9 +13,9 @@ end
 
 -- Pull NvChad defaults (capabilities, on_attach, on_init, etc.)
 local nvlsp = require("nvchad.configs.lspconfig")
+nvlsp.defaults()
 
 local base = {
-	on_attach = nvlsp.on_attach,
 	on_init = nvlsp.on_init,
 	capabilities = nvlsp.capabilities,
 }
@@ -23,6 +23,34 @@ local base = {
 local function with_base(opts)
 	return vim.tbl_deep_extend("force", {}, base, opts or {})
 end
+
+-- Keep language servers from treating a home-level .git as a whole-home workspace.
+local function bounded_root(markers)
+	return function(bufnr, on_dir)
+		local root = vim.fs.root(bufnr, markers)
+		local home = vim.fs.normalize(vim.uv.os_homedir())
+		if not root or root == home or root == "/" then
+			root = vim.fs.dirname(vim.api.nvim_buf_get_name(bufnr))
+		end
+		if root and root ~= home and root ~= "/" then
+			on_dir(root)
+		end
+	end
+end
+
+vim.lsp.config("lua_ls", {
+	root_dir = bounded_root({
+		".emmyrc.json",
+		".luarc.json",
+		".luarc.jsonc",
+		".luacheckrc",
+		".stylua.toml",
+		"stylua.toml",
+		"selene.toml",
+		"selene.yml",
+		".git",
+	}),
+})
 
 -- -----------------------------
 -- Simple servers
@@ -63,25 +91,20 @@ vim.lsp.config(
 	"ty",
 	with_base({
 		cmd = ty_cmd,
-		root_dir = function(bufnr, on_dir)
-			local root = vim.fs.root(bufnr, {
-				"ty.toml",
-				"pyproject.toml",
-				"setup.py",
-				"setup.cfg",
-				"requirements.txt",
-				"Pipfile",
-				".git",
-			})
-			local home = vim.fs.normalize(vim.uv.os_homedir())
-			-- A home-level .git must not make all personal files a Python workspace.
-			if not root or root == home or root == "/" then
-				root = vim.fs.dirname(vim.api.nvim_buf_get_name(bufnr))
-			end
-			if root and root ~= home and root ~= "/" then
-				on_dir(root)
-			end
-		end,
+		capabilities = {
+			workspace = {
+				didChangeWatchedFiles = { dynamicRegistration = true },
+			},
+		},
+		root_dir = bounded_root({
+			"ty.toml",
+			"pyproject.toml",
+			"setup.py",
+			"setup.cfg",
+			"requirements.txt",
+			"Pipfile",
+			".git",
+		}),
 		settings = {
 			ty = {
 				diagnosticMode = "openFilesOnly",
@@ -91,11 +114,12 @@ vim.lsp.config(
 )
 
 -- -----------------------------
--- MATLAB: official MathWorks language server
---
--- Full features require MATLAB installed on the machine running Neovim.
--- If this machine does not have MATLAB, set matlabConnectionTiming = "never"
--- to avoid spawn errors, but expect reduced functionality.
+-- MATLAB: use MATLAB_ROOT or a MATLAB executable on PATH when available.
+local matlab_root = vim.env.MATLAB_ROOT
+if matlab_root and vim.fn.isdirectory(matlab_root) == 0 then
+	matlab_root = nil
+end
+local matlab_available = matlab_root ~= nil or vim.fn.executable("matlab") == 1
 
 vim.filetype.add({
 	extension = {
@@ -109,32 +133,15 @@ vim.lsp.config(
 		cmd = { "matlab-language-server", "--stdio" },
 		filetypes = { "matlab" },
 
-		root_dir = function(bufnr, on_dir)
-			local fname = vim.api.nvim_buf_get_name(bufnr)
-			local root = vim.fs.root(fname, {
-				".git",
-				"startup.m",
-				"matlab.prj",
-				"SimulinkProject",
-			})
-			on_dir(root or vim.fn.getcwd())
-		end,
+		root_dir = bounded_root({ ".git", "startup.m", "matlab.prj", "SimulinkProject" }),
 
 		settings = {
 			MATLAB = {
 				indexWorkspace = true,
 
-				-- On the remote/Linux machine where MATLAB exists, use the real matlabroot.
-				-- Based on your earlier shell path, this is probably:
-				installPath = "/usr/local/MATLAB/R2026a",
+				installPath = matlab_root or "",
+				matlabConnectionTiming = matlab_available and "onStart" or "never",
 
-				-- Options:
-				--   "onStart"  = start MATLAB when opening a MATLAB file
-				--   "onDemand" = start MATLAB only for features that need it
-				--   "never"    = do not start MATLAB; safer on machines without MATLAB
-				matlabConnectionTiming = "onStart",
-
-				-- I would turn this off unless you specifically want MathWorks telemetry.
 				telemetry = false,
 			},
 		},
@@ -149,5 +156,8 @@ vim.lsp.enable({
 	"bashls",
 	"clangd",
 	"ty",
-	"matlab_ls",
 })
+
+if vim.fn.executable("matlab-language-server") == 1 then
+	vim.lsp.enable("matlab_ls")
+end

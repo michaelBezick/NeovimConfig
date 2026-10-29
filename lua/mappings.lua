@@ -13,11 +13,11 @@ map("n", "<C-p>", "<C-i>", { desc = "Jump next in jump list", noremap = true, si
 -- Telescope LSP symbols
 map("n", "<leader>fds", function()
 	require("telescope.builtin").lsp_dynamic_workspace_symbols()
-end, { desc = "Find Dynamic Document Symbols", noremap = true, silent = true })
+end, { desc = "Find Dynamic Workspace Symbols", noremap = true, silent = true })
 
 map("n", "<leader>fs", function()
 	require("telescope.builtin").lsp_workspace_symbols()
-end, { desc = "Find Document Symbols", noremap = true, silent = true })
+end, { desc = "Find Workspace Symbols", noremap = true, silent = true })
 
 -- Find classes with Telescope
 map("n", "<leader>fc", function()
@@ -43,11 +43,13 @@ end, { desc = "Format Code" })
 map("v", ">", ">gv", { desc = "Indent in visual mode" })
 
 -- Git blame
-map("n", "<leader>gb", "<cmd>Git blame<cr>",{ desc = "Git blame (fugitive)", noremap = true, silent = true })
+map("n", "<leader>gb", function()
+	require("gitsigns").blame()
+end, { desc = "Git Blame" })
 
 -- Toggle Markdown preview
 map("n", "<leader>mp", "<cmd>MarkdownPreviewToggle<cr>", {
-  desc = "Toggle Markdown Preview",
-  noremap = true,
-  silent = true,
+	desc = "Toggle Markdown Preview",
+	noremap = true,
+	silent = true,
 })

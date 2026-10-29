@@ -42,7 +42,9 @@ return {
 				"vimdoc",
 				"html",
 				"css",
-				"clangd",
+				"c",
+				"cpp",
+				"cuda",
 				"python",
 				"matlab",
 			},
@@ -91,17 +93,17 @@ return {
 		build = function()
 			vim.fn["mkdp#util#install"]()
 		end,
-		{
-			"r-pletnev/pdfreader.nvim",
-			lazy = false,
-			dependencies = {
-				"folke/snacks.nvim",
-				"nvim-telescope/telescope.nvim",
-			},
-			config = function()
-				require("pdfreader").setup()
-			end,
+	},
+	{
+		"r-pletnev/pdfreader.nvim",
+		lazy = false,
+		dependencies = {
+			"folke/snacks.nvim",
+			"nvim-telescope/telescope.nvim",
 		},
+		config = function()
+			require("pdfreader").setup()
+		end,
 	},
 	{
 		"3rd/image.nvim",
