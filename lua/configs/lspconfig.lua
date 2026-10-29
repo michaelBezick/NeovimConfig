@@ -51,14 +51,27 @@ vim.lsp.config(
 )
 
 -- -----------------------------
--- Python: pyright (primary)
+-- Python: ty
+local ty_cmd = { "ty", "server" }
+if vim.env.VIRTUAL_ENV and vim.fn.isdirectory(vim.env.VIRTUAL_ENV) == 0 then
+	-- A deleted activated environment makes ty fail before it can discover Python.
+	-- Only sanitize the server process; leave Neovim's environment unchanged.
+	ty_cmd = { "env", "-u", "VIRTUAL_ENV", "ty", "server" }
+end
+
 vim.lsp.config(
-	"pyright",
+	"ty",
 	with_base({
+		cmd = ty_cmd,
 		root_dir = function(bufnr, on_dir)
 			local root = vim.fs.root(bufnr, {
-				"pyrightconfig.json", "pyproject.toml", "setup.py", "setup.cfg",
-				"requirements.txt", "Pipfile", ".git",
+				"ty.toml",
+				"pyproject.toml",
+				"setup.py",
+				"setup.cfg",
+				"requirements.txt",
+				"Pipfile",
+				".git",
 			})
 			local home = vim.fs.normalize(vim.uv.os_homedir())
 			-- A home-level .git must not make all personal files a Python workspace.
@@ -70,55 +83,10 @@ vim.lsp.config(
 			end
 		end,
 		settings = {
-			pyright = {
-				-- You can add pyright-specific toggles here if you want
-				-- (most analysis knobs live under python.analysis)
-				-- disableOrganizeImports = false,
-			},
-			python = {
-				analysis = {
-					-- typeCheckingMode = "off",
-					useLibraryCodeForTypes = true,
-					autoImportCompletions = true,
-					diagnosticMode = "openFilesOnly",
-					-- stubPath = "typings",
-				},
+			ty = {
+				diagnosticMode = "openFilesOnly",
 			},
 		},
-	})
-)
-
--- -- -----------------------------
--- -- Python: basedpyright (primary)
--- vim.lsp.config("basedpyright", with_base({
---   settings = {
---     basedpyright = {
---       analysis = {
---         -- typeCheckingMode = "off",
---         useLibraryCodeForTypes = true,
---         autoImportCompletions = true,
---         diagnosticMode = "openFilesOnly",
---         -- stubPath = "typings",
---       },
---     },
---   },
--- }))
-
--- -----------------------------
--- Optional: Jedi (completion help on dynamic C-extensions)
-vim.lsp.config(
-	"jedi_language_server",
-	with_base({
-		on_attach = function(client, bufnr)
-			-- disable Jedi diagnostics to avoid duplicates with basedpyright
-			client.server_capabilities.diagnosticProvider = nil
-			client.handlers["textDocument/publishDiagnostics"] = function() end
-
-			if base.on_attach then
-				base.on_attach(client, bufnr)
-			end
-		end,
-		single_file_support = true,
 	})
 )
 
@@ -180,7 +148,6 @@ vim.lsp.enable({
 	"cssls",
 	"bashls",
 	"clangd",
-	"pyright",
-	"jedi_language_server",
+	"ty",
 	"matlab_ls",
 })
