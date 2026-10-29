@@ -42,10 +42,20 @@ end, { desc = "Format Code" })
 -- Visual mode better indenting
 map("v", ">", ">gv", { desc = "Indent in visual mode" })
 
--- Git blame
+-- Toggle the blame panel in the current tab, from either pane.
 map("n", "<leader>gb", function()
-	require("gitsigns").blame()
-end, { desc = "Git Blame" })
+	local closed = false
+	for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+		local buf = vim.api.nvim_win_get_buf(win)
+		if vim.bo[buf].filetype == "gitsigns-blame" then
+			vim.api.nvim_win_close(win, false)
+			closed = true
+		end
+	end
+	if not closed then
+		require("gitsigns").blame()
+	end
+end, { desc = "Toggle Git Blame" })
 
 -- Toggle Markdown preview
 map("n", "<leader>mp", "<cmd>MarkdownPreviewToggle<cr>", {
