@@ -36,9 +36,14 @@ vim.schedule(function()
   require "mappings"
 end)
 
--- Make sure .cu and .cuh are treated as 'cuda' filetype
 vim.filetype.add({
-  extension = { cu = "cuda", cuh = "cuda" },
+  extension = {
+    -- Make sure .cu and .cuh are treated as 'cuda' filetype
+    cu = "cuda",
+    cuh = "cuda",
+    -- Treat .m files as MATLAB instead of Objective-C
+    m = "matlab",
+  },
 })
 
 -- Keep warnings available without adding inline clutter while editing.
@@ -59,4 +64,4 @@ vim.diagnostic.config({
   },
 })
 
-require "configs.neogit_hightlights"
+require "configs.neogit_highlights"

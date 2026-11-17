@@ -11,7 +11,8 @@ local map = vim.keymap.set
 map("n", "<C-p>", "<C-i>", { desc = "Jump next in jump list", noremap = true, silent = true })
 
 -- Telescope LSP symbols
-map("n", "<leader>fds", function()
+-- (capital S so it is not a prefix clash with <leader>fd / <leader>fs)
+map("n", "<leader>fS", function()
 	require("telescope.builtin").lsp_dynamic_workspace_symbols()
 end, { desc = "Find Dynamic Workspace Symbols", noremap = true, silent = true })
 
@@ -37,13 +38,9 @@ map("n", "<leader>fn", function()
 	require("telescope.builtin").lsp_document_symbols({ symbols = { "function", "method" } })
 end, { desc = "Find Functions", noremap = true, silent = true })
 
--- Format using Conform
-map("n", "<leader>fm", function()
-	require("conform").format()
-end, { desc = "Format Code" })
-
 -- Visual mode better indenting
 map("v", ">", ">gv", { desc = "Indent in visual mode" })
+map("v", "<", "<gv", { desc = "Dedent in visual mode" })
 
 -- Toggle the blame panel in the current tab, from either pane.
 map("n", "<leader>gb", function()

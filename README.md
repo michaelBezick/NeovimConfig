@@ -1,6 +1,6 @@
 # Neovim configuration
 
-Personal NvChad configuration for Neovim 0.11+.
+Personal NvChad configuration for Neovim 0.12+.
 
 ## Python
 
@@ -17,7 +17,8 @@ virtual environments, Conda environments, or a project `.venv`. A stale
 `VIRTUAL_ENV` pointing to a deleted directory is ignored for the server process.
 Project settings belong in `ty.toml` or `[tool.ty]` in `pyproject.toml`.
 
-Diagnostic display updates while typing. Diagnostics are limited to open files,
+Diagnostics refresh when you leave insert mode, and only errors are shown
+inline. Diagnostics are limited to open files,
 and Python, Lua, and MATLAB workspace roots are bounded to avoid scanning the
 entire home directory. Use `:checkhealth vim.lsp` to inspect clients.
 
@@ -41,7 +42,9 @@ formatters are Stylua, clang-format, and yamlfmt, available through Mason.
 
 `<leader>gb` opens the Gitsigns blame view. `<leader>gg` opens Neogit.
 Treesitter installs C, C++, CUDA, Python, MATLAB, and the configured markup/Lua
-parsers. `clangd` is an LSP executable, not a Treesitter parser.
+parsers. `clangd` is an LSP executable, not a Treesitter parser. Building parsers
+requires the [`tree-sitter` CLI](https://github.com/tree-sitter/tree-sitter/releases)
+(0.26.1+), a C compiler, `tar`, and `curl`.
 
 Lua language services use NvChad's defaults. For MATLAB, install
 `matlab-language-server` separately and set `MATLAB_ROOT` when MATLAB is not on
