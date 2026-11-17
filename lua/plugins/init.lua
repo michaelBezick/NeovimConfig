@@ -35,6 +35,15 @@ return {
 	},
 	{
 		"nvim-treesitter/nvim-treesitter",
+		-- `main` branch: needs Neovim 0.12+ and the tree-sitter CLI, and does not
+		-- support lazy-loading. Highlighting is started by NvChad's FileType autocmd.
+		branch = "main",
+		lazy = false,
+		build = ":TSUpdate",
+		config = function(_, opts)
+			-- No-op for parsers that are already installed.
+			require("nvim-treesitter").install(opts.ensure_installed)
+		end,
 		opts = {
 			ensure_installed = {
 				"vim",
@@ -47,6 +56,10 @@ return {
 				"cuda",
 				"python",
 				"matlab",
+				"julia",
+				"yaml",
+				"luadoc",
+				"printf",
 			},
 		},
 	},

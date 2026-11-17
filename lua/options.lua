@@ -9,6 +9,13 @@ local swap_dir = vim.fn.stdpath("state") .. "/swap"
 vim.fn.mkdir(swap_dir, "p")
 vim.opt.directory = swap_dir .. "//"
 
+-- Language servers can be chatty on stderr; start over once the log gets large.
+local lsp_log = vim.lsp.log.get_filename()
+local lsp_log_stat = vim.uv.fs_stat(lsp_log)
+if lsp_log_stat and lsp_log_stat.size > 5 * 1024 * 1024 then
+	vim.fn.delete(lsp_log)
+end
+
 local previews = vim.api.nvim_create_augroup("UserPreviewRedraw", { clear = true })
 
 local function redraw_preview(args)

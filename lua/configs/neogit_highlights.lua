@@ -1,5 +1,3 @@
--- ~/.config/nvim/lua/configs/neogit_highlights.lua
-
 local function set_neogit_highlights()
   -- The "deleted" status word
   vim.api.nvim_set_hl(0, "NeogitChangeDeleted", {
