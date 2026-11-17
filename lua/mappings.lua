@@ -24,6 +24,9 @@ map("n", "<leader>fc", function()
 	require("telescope.builtin").lsp_document_symbols({ symbols = "class" })
 end, { desc = "Find Classes" })
 
+-- Show diagnostics for the current line.
+map("n", "<leader>ld", vim.diagnostic.open_float, { desc = "Show line diagnostics" })
+
 -- Find diagnostics with Telescope
 map("n", "<leader>fd", function()
 	require("telescope.builtin").diagnostics()
