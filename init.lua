@@ -41,12 +41,22 @@ vim.filetype.add({
   extension = { cu = "cuda", cuh = "cuda" },
 })
 
+-- Keep warnings available without adding inline clutter while editing.
 vim.diagnostic.config({
-  virtual_text = true,
-  signs = true,
-  underline = true,
   update_in_insert = false,
   severity_sort = true,
+  virtual_lines = false,
+  virtual_text = {
+    severity = { min = vim.diagnostic.severity.ERROR },
+  },
+  signs = true,
+  underline = {
+    severity = { min = vim.diagnostic.severity.ERROR },
+  },
+  float = {
+    source = "if_many",
+    border = "rounded",
+  },
 })
 
 require "configs.neogit_hightlights"
