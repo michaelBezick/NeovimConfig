@@ -111,7 +111,14 @@ return {
 		"r-pletnev/pdfreader.nvim",
 		lazy = false,
 		dependencies = {
-			"folke/snacks.nvim",
+			{
+				"folke/snacks.nvim",
+				-- pdfreader only needs snacks' image placement API. Rendering a
+				-- page lazily runs Snacks.image.setup(), which registers snacks'
+				-- own viewer for *.png, *.pdf, ... and then draws a second copy on
+				-- top of image.nvim / pdfreader for every preview opened afterwards.
+				opts = { image = { enabled = false } },
+			},
 			"nvim-telescope/telescope.nvim",
 		},
 		config = function()
